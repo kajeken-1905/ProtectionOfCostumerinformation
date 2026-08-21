@@ -884,6 +884,14 @@
       });
 
       var actionCard = el("div", "card");
+
+      if(!window.claude){
+        actionCard.appendChild(el("div", "hint", "이 화면에서는 자동 저장 버튼을 쓸 수 없어요 (claude.ai 앱/채팅 안의 아티팩트 패널이 아니라 링크를 브라우저에서 바로 열었을 때 나타나는 제한입니다). 위 이미지 두 장을 각각 길게 눌러 '사진에 저장'한 뒤 메일에 첨부해주세요."));
+        actionCard.appendChild(el("div","hint","파일명 예시: " + state.inspectDate + "_" + (state.storeBranch||"매장") + ".pdf"));
+        mainEl.appendChild(actionCard);
+        return;
+      }
+
       var pdfBtn = el("button", "btn btn-primary btn-block", "PDF로 한번에 저장");
       var statusMsg = el("div", "status-msg");
       pdfBtn.onclick = function(){
