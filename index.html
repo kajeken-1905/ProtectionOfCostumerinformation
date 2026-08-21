@@ -950,9 +950,9 @@
     // name written on the "___(서명)" line itself
     fitTextCentered(ctx, state.vocName, 1438, 3248, 290);
 
-    // signature image just above that line, over the "(서명)" mark
+    // signature image directly over the "(서명)" label
     if(vocSig.getCanvas()){
-      ctx.drawImage(vocSig.getCanvas(), 1308, 3175, 260, 66);
+      ctx.drawImage(vocSig.getCanvas(), 1560, 3188, 190, 82);
     }
 
     return c;
