@@ -166,8 +166,33 @@
     font-size:15px; font-weight:900; color:transparent; transition:all .15s; margin-top:1px;
   }
   .check-item.on .box{ background:var(--success); border-color:var(--success); color:#fff; }
-  .check-item .txt{ font-size:13.6px; line-height:1.45; }
+  .check-item .box{ cursor:pointer; }
+  .check-item .txt{
+    font-size:13.6px; line-height:1.45; cursor:pointer; flex:1;
+    text-decoration:underline; text-decoration-style:dotted; text-underline-offset:3px; text-decoration-color:var(--text-muted);
+  }
   .check-item .txt b{ font-weight:600; }
+  .modal-overlay{
+    position:fixed; inset:0; background:rgba(10,12,10,.55); z-index:100;
+    display:flex; align-items:flex-end; justify-content:center;
+  }
+  .modal-sheet{
+    background:var(--surface); width:100%; max-width:520px; border-radius:16px 16px 0 0;
+    max-height:78vh; overflow-y:auto; padding:20px 20px calc(20px + env(safe-area-inset-bottom));
+    animation:modal-up .18s ease-out;
+  }
+  @keyframes modal-up{ from{ transform:translateY(16px); opacity:0; } to{ transform:translateY(0); opacity:1; } }
+  .modal-sheet h3{ font-size:16px; margin:0 0 12px; font-weight:700; padding-right:30px; }
+  .modal-sheet pre{
+    font-family:var(--font-ui); font-size:13.5px; line-height:1.65; white-space:pre-wrap;
+    margin:0 0 16px; color:var(--text);
+  }
+  .modal-close{
+    position:absolute; top:14px; right:14px; width:30px; height:30px; border-radius:8px;
+    background:var(--surface-2); border:1px solid var(--border); color:var(--text);
+    font-size:16px; line-height:1; cursor:pointer;
+  }
+  .modal-sheet{ position:relative; }
   .voc-list{ list-style:none; margin:0 0 18px; padding:0; counter-reset:voc; }
   .voc-list li{
     counter-increment:voc; position:relative; padding:8px 0 8px 30px; font-size:13px;
@@ -335,20 +360,57 @@
 
   var CHECK_GROUPS = [
     { title: "실태점검", items: [
-      { label: "PC·노트북·태블릿 등 미파기 고객정보 파일 점검 및 삭제", y: 200.5 },
-      { label: "개인정보 검색 프로그램(이글아이) 활용 점검 및 삭제", y: 282.5 },
-      { label: "고객정보 서류 보관실태 점검 및 삭제(파기 포함)", y: 372 }
+      { label: "PC·노트북·태블릿 등 미파기 고객정보 파일 점검 및 삭제", y: 200.5,
+        detail: "1. PC(노트북, 태블릿 포함), 보조저장매체, 모바일기기 등 고객정보 파일 보관실태 점검 및 삭제\n\n" +
+          "- 미파기 고객 개인정보 자가점검 코드(SwingPC, 일반PC) 및 자가점검 Tool 참고\n" +
+          "  · 문서파일 : MS word, Excel, PowerPoint, 한글, 메모장(txt) 등\n" +
+          "  · 이미지파일 : 신청서/신분증/증명서류 스캔, 모니터링연계법, 고객사진 등\n" +
+          "  · 검색된 문서 및 이미지파일을 점검하여 고객정보 삭제\n\n" +
+          "업무용 장치(PC/모바일/태블릿/이동체계), 개인용 다바이스 및 이동체계는 삭제 대상입니다." },
+      { label: "개인정보 검색 프로그램(이글아이) 활용 점검 및 삭제", y: 282.5,
+        detail: "2. 개인정보 검색 프로그램(이글아이) 활용 점검 및 삭제\n\n" +
+          "- 프로그램 실행 : PC화면 우측 하단의 '이글아이' 아이콘 더블클릭\n" +
+          "- '수동검사' 탭으로 이동하여 '검사시작'\n" +
+          "- 파일검사 결과에 검출된 파일을 점검하여 고객정보 삭제" },
+      { label: "고객정보 서류 보관실태 점검 및 삭제(파기 포함)", y: 372,
+        detail: "○ 매장 또는 업무사무실에서 취급하는 고객정보 서류 보관실태 점검 및 삭제\n\n" +
+          "① 각종 계약서/신분증/영수증/메모/수집/발송 등 고객정보가 작성된 모든 서류 점검\n" +
+          "  · 적상(위/척), 서랍, 금전보관함, 캐비닛, 창고, 차량 내부 등\n" +
+          "  · 프린터·복사기·팩스기기 출력본, 변견기단자함/화장실/창고/욕실/지하실/주차장 등\n\n" +
+          "② 고객정보 보호기준을 위반한 서류 파기\n" +
+          "  · 복구 불가능한 방법으로 파기(파쇄기 이용)" }
     ]},
     { title: "업무용 PC 보안관리", items: [
-      { label: "로그인 비밀번호 적용 및 정기변경(3개월 1회)", y: 454 },
-      { label: "화면보호기 설정(대기 10분 이내)", y: 495.5 },
-      { label: "보안관리 프로그램 설치(PMS/SafePC/이글아이 등)", y: 536.5 }
+      { label: "로그인 비밀번호 적용 및 정기변경(3개월 1회)", y: 454,
+        detail: "1. 로그인 비밀번호 적용 및 정기변경 : 3개월 1회 이상 비밀번호 변경\n\n" +
+          "  · 영문, 숫자, 특수문자 중 3종류 이상을 조합하여 8자리 이상\n" +
+          "  · 영문, 숫자, 특수문자 중 2종류 이상을 조합하여 10자리 이상" },
+      { label: "화면보호기 설정(대기 10분 이내)", y: 495.5,
+        detail: "2. 화면보호기 설정\n\n" +
+          "- 화면보호기 대기시간 10분 이내로 설정(다시 시작할 때 로그온 화면 표시 체크)" },
+      { label: "보안관리 프로그램 설치(PMS/SafePC/이글아이 등)", y: 536.5,
+        detail: "3. 보안관리 프로그램 설치\n\n" +
+          "- PMS(패치관리시스템), SafePC(PC보안), 이글아이(개인정보검색), SEP(바이러스백신)\n" +
+          "- 보안 솔루션 다운로드 URL : https://t-secu.sktelecom.com (SwingPC에 한함)" }
     ]},
     { title: "기기보안 (스마트패드너)", items: [
-      { label: "화면잠금 설정", y: 586 },
-      { label: "보안 애플리케이션 설치 및 정상작동 확인", y: 627.5 },
-      { label: "스마트패드너 계정 등기화 해제", y: 668.5 },
-      { label: "스마트패드너 사용 현황 최신화", y: 734 }
+      { label: "화면잠금 설정", y: 586,
+        detail: "1. 스마트패드너 화면잠금 설정\n\n" +
+          "  · Android : 설정 → 잠금화면 → 화면 잠금 방식 선택\n" +
+          "  · iOS : 설정 → 암호 및 FACE ID → 암호 설정" },
+      { label: "보안 애플리케이션 설치 및 정상작동 확인", y: 627.5,
+        detail: "2. 보안 애플리케이션 설치 및 정상작동 확인\n\n" +
+          "  · 보안솔루션 SSM(Smart Device Security Management) 설치" },
+      { label: "스마트패드너 계정 등기화 해제", y: 668.5,
+        detail: "3. 스마트패드너 계정 등기화 해제\n\n" +
+          "  · Android : 설정 → 계정 및 백업 → 계정 → 연동된 계정 삭제\n" +
+          "  · iOS : 설정 → iTunes 및 App Store → [Apple ID] 클릭 → 비밀번호 입력 → 로그아웃" },
+      { label: "스마트패드너 사용 현황 최신화", y: 734,
+        detail: "4. 스마트패드너(T-Tablet) 사용 현황 최신화\n\n" +
+          "- Swing에 등록된 정보와 실제 사용중인 정보 일치하도록 갱신\n" +
+          "  · Swing – 사용자/조직별 접속 단말기 관리 내 등록 확인\n" +
+          "  · 매장 내 실 사용중인 스마트패드너와 Swing 전산 상 등록된 스마트패드너 MAC주소 확인\n" +
+          "  · 분실 및 고장으로 인해 스마트패드너 MAC주소 확인이 불가능한 경우 Helpdesk 문의" }
     ]}
   ];
   var ALL_ITEMS = [];
@@ -380,7 +442,71 @@
     stores: loadStores()
   };
 
-  var sigCanvas, sigCtx, sigHasStroke = false, sigPoints = [];
+  function createSignaturePad(){
+    var canvas = null, ctx = null, hasStroke = false, points = [];
+    function pos(e){
+      var r = canvas.getBoundingClientRect();
+      var cx = (e.touches ? e.touches[0].clientX : e.clientX) - r.left;
+      var cy = (e.touches ? e.touches[0].clientY : e.clientY) - r.top;
+      return {x:cx, y:cy};
+    }
+    function redraw(cssW, cssH){
+      ctx.clearRect(0,0,cssW,cssH);
+      points.forEach(function(stroke){
+        if(stroke.length < 2) return;
+        ctx.beginPath();
+        ctx.moveTo(stroke[0].x, stroke[0].y);
+        for(var i=1;i<stroke.length;i++) ctx.lineTo(stroke[i].x, stroke[i].y);
+        ctx.stroke();
+      });
+    }
+    function attach(el){
+      canvas = el;
+      var ratio = window.devicePixelRatio || 1;
+      var cssW = canvas.clientWidth || 300;
+      var cssH = 150;
+      canvas.width = cssW * ratio;
+      canvas.height = cssH * ratio;
+      ctx = canvas.getContext("2d");
+      ctx.scale(ratio, ratio);
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      ctx.lineWidth = 2.6;
+      ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue("--text").trim() || "#111";
+      if(hasStroke && points.length) redraw(cssW, cssH);
+
+      var drawing = false, last = null;
+      function start(e){ e.preventDefault(); drawing = true; last = pos(e); points.push([last]); }
+      function move(e){
+        if(!drawing) return;
+        e.preventDefault();
+        var p = pos(e);
+        ctx.beginPath(); ctx.moveTo(last.x, last.y); ctx.lineTo(p.x, p.y); ctx.stroke();
+        last = p;
+        points[points.length-1].push(p);
+        hasStroke = true;
+      }
+      function end(){ if(drawing){ drawing = false; last = null; renderNav(); } }
+      canvas.addEventListener("pointerdown", start);
+      canvas.addEventListener("pointermove", move);
+      window.addEventListener("pointerup", end);
+      canvas.addEventListener("touchstart", start, {passive:false});
+      canvas.addEventListener("touchmove", move, {passive:false});
+      canvas.addEventListener("touchend", end);
+    }
+    function clear(){
+      points = []; hasStroke = false;
+      if(ctx && canvas) ctx.clearRect(0,0,canvas.clientWidth,150);
+    }
+    return {
+      attach: attach,
+      clear: clear,
+      hasStroke: function(){ return hasStroke; },
+      getCanvas: function(){ return canvas; }
+    };
+  }
+  var vocSig = createSignaturePad();
+  var inspectorSig = createSignaturePad();
 
   function todayStr(){
     var d = new Date();
@@ -447,10 +573,10 @@
       return state.storeBranch.trim().length > 0 && state.inspector.trim().length > 0;
     }
     if(step === 1){
-      return true;
+      return inspectorSig.hasStroke();
     }
     if(step === 2){
-      return state.vocName.trim().length > 0 && sigHasStroke;
+      return state.vocName.trim().length > 0 && vocSig.hasStroke();
     }
     return true;
   }
@@ -620,12 +746,27 @@
     });
   }
 
+  function openGuideModal(item){
+    var overlay = el("div", "modal-overlay");
+    overlay.onclick = function(e){ if(e.target === overlay) overlay.remove(); };
+    var sheet = el("div", "modal-sheet");
+    var closeBtn = el("button", "modal-close", "×");
+    closeBtn.onclick = function(){ overlay.remove(); };
+    sheet.appendChild(closeBtn);
+    sheet.appendChild(el("h3", "", escapeHtml(item.label)));
+    var pre = document.createElement("pre");
+    pre.textContent = item.detail || item.label;
+    sheet.appendChild(pre);
+    overlay.appendChild(sheet);
+    document.body.appendChild(overlay);
+  }
+
   // ---------- Step 1: checklist ----------
   function renderChecklist(){
     mainEl.innerHTML = "";
     mainEl.appendChild(el("p", "step-label", "STEP 2 / 4"));
     mainEl.appendChild(el("h2", "step-title", "고객정보보호 체크리스트"));
-    mainEl.appendChild(el("p", "step-desc", "실태점검 항목을 확인하고 완료된 항목을 체크하세요."));
+    mainEl.appendChild(el("p", "step-desc", "실태점검 항목을 확인하고 완료된 항목을 체크하세요. 항목 문장을 누르면 실행 가이드 전체를 볼 수 있습니다. 체크가 끝나면 점검자 본인이 확인 서명을 합니다."));
 
     var idx = 0;
     CHECK_GROUPS.forEach(function(group, gi){
@@ -639,11 +780,12 @@
           var row = el("div", "check-item" + (state.checks[myIdx] ? " on" : ""));
           var box = el("div", "box", "✓");
           var txt = el("div", "txt", escapeHtml(item.label));
-          row.appendChild(box); row.appendChild(txt);
-          row.onclick = function(){
+          box.onclick = function(){
             state.checks[myIdx] = !state.checks[myIdx];
             render();
           };
+          txt.onclick = function(){ openGuideModal(item); };
+          row.appendChild(box); row.appendChild(txt);
           card.appendChild(row);
         })(idx);
         idx++;
@@ -654,6 +796,19 @@
 
     var doneCount = state.checks.filter(Boolean).length;
     mainEl.appendChild(el("p", "hint", doneCount + " / " + ALL_ITEMS.length + " 항목 체크됨 · 미체크 항목이 있어도 다음 단계로 진행할 수 있습니다."));
+
+    var sigCard = el("div", "card");
+    sigCard.appendChild(el("label", "field-label", "점검자 확인 서명 " + '<span class="required-star">*</span>'));
+    var canvas = document.createElement("canvas");
+    canvas.className = "sigpad";
+    sigCard.appendChild(canvas);
+    var sigActions = el("div", "sig-actions");
+    var clearBtn = el("button", "btn btn-sm btn-ghost", "다시 서명");
+    clearBtn.onclick = function(){ inspectorSig.clear(); renderNav(); };
+    sigActions.appendChild(clearBtn);
+    sigCard.appendChild(sigActions);
+    mainEl.appendChild(sigCard);
+    inspectorSig.attach(canvas);
   }
 
   // ---------- Step 2: VOC pledge ----------
@@ -688,84 +843,12 @@
     card.appendChild(canvas);
     var sigActions = el("div", "sig-actions");
     var clearBtn = el("button", "btn btn-sm btn-ghost", "다시 서명");
-    clearBtn.onclick = function(){ clearSignature(); renderNav(); };
+    clearBtn.onclick = function(){ vocSig.clear(); renderNav(); };
     sigActions.appendChild(clearBtn);
     card.appendChild(sigActions);
     mainEl.appendChild(card);
 
-    setupSignaturePad(canvas);
-  }
-
-  function setupSignaturePad(canvas){
-    sigCanvas = canvas;
-    var ratio = window.devicePixelRatio || 1;
-    var cssW = canvas.clientWidth || 300;
-    var cssH = 150;
-    canvas.width = cssW * ratio;
-    canvas.height = cssH * ratio;
-    sigCtx = canvas.getContext("2d");
-    sigCtx.scale(ratio, ratio);
-    sigCtx.lineCap = "round";
-    sigCtx.lineJoin = "round";
-    sigCtx.lineWidth = 2.6;
-    sigCtx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue("--text").trim() || "#111";
-
-    if(sigHasStroke && sigPoints.length){
-      redrawSignature(cssW, cssH);
-    }
-
-    var drawing = false;
-    var last = null;
-
-    function pos(e){
-      var r = canvas.getBoundingClientRect();
-      var cx = (e.touches ? e.touches[0].clientX : e.clientX) - r.left;
-      var cy = (e.touches ? e.touches[0].clientY : e.clientY) - r.top;
-      return {x:cx, y:cy};
-    }
-    function start(e){
-      e.preventDefault();
-      drawing = true;
-      last = pos(e);
-      sigPoints.push([last]);
-    }
-    function move(e){
-      if(!drawing) return;
-      e.preventDefault();
-      var p = pos(e);
-      sigCtx.beginPath();
-      sigCtx.moveTo(last.x, last.y);
-      sigCtx.lineTo(p.x, p.y);
-      sigCtx.stroke();
-      last = p;
-      sigPoints[sigPoints.length-1].push(p);
-      sigHasStroke = true;
-    }
-    function end(){ if(drawing){ drawing = false; last = null; renderNav(); } }
-
-    canvas.addEventListener("pointerdown", start);
-    canvas.addEventListener("pointermove", move);
-    window.addEventListener("pointerup", end);
-    canvas.addEventListener("touchstart", start, {passive:false});
-    canvas.addEventListener("touchmove", move, {passive:false});
-    canvas.addEventListener("touchend", end);
-  }
-
-  function redrawSignature(cssW, cssH){
-    sigCtx.clearRect(0,0,cssW,cssH);
-    sigPoints.forEach(function(stroke){
-      if(stroke.length < 2) return;
-      sigCtx.beginPath();
-      sigCtx.moveTo(stroke[0].x, stroke[0].y);
-      for(var i=1;i<stroke.length;i++) sigCtx.lineTo(stroke[i].x, stroke[i].y);
-      sigCtx.stroke();
-    });
-  }
-
-  function clearSignature(){
-    sigPoints = [];
-    sigHasStroke = false;
-    if(sigCtx && sigCanvas) sigCtx.clearRect(0,0,sigCanvas.clientWidth,150);
+    vocSig.attach(canvas);
   }
 
   // ---------- Step 3: preview & save ----------
@@ -861,6 +944,11 @@
     fitText(ctx, formatDateDot(state.inspectDate), 100, 106, 95);
     fitText(ctx, state.inspector, 420, 106, 85);
 
+    // inspector's confirmation signature over the "(확인)" mark next to 점검자
+    if(inspectorSig.getCanvas()){
+      ctx.drawImage(inspectorSig.getCanvas(), 508, 92, 50, 20);
+    }
+
     ctx.textAlign = "center";
     ctx.font = "bold 15px 'Malgun Gothic','Apple SD Gothic Neo',sans-serif";
     ALL_ITEMS.forEach(function(item, i){
@@ -902,8 +990,8 @@
     fitTextCentered(ctx, shortAgency(state.storeAgency), 212, 734, 68);
 
     // signature image onto the "___(서명)" line
-    if(sigCanvas){
-      ctx.drawImage(sigCanvas, 293, 704, 60, 30);
+    if(vocSig.getCanvas()){
+      ctx.drawImage(vocSig.getCanvas(), 293, 704, 60, 30);
     }
     // printed name under signature
     ctx.font = "9px 'Malgun Gothic','Apple SD Gothic Neo',sans-serif";
@@ -1046,7 +1134,8 @@
     state.checks = ALL_ITEMS.map(function(){ return false; });
     state.vocName = "";
     state.vocDate = todayStr();
-    clearSignature();
+    vocSig.clear();
+    inspectorSig.clear();
   }
 
   render();
