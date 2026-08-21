@@ -472,8 +472,8 @@
       ctx.scale(ratio, ratio);
       ctx.lineCap = "round";
       ctx.lineJoin = "round";
-      ctx.lineWidth = 2.6;
-      ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue("--text").trim() || "#111";
+      ctx.lineWidth = 3.6;
+      ctx.strokeStyle = "#000";
       if(hasStroke && points.length) redraw(cssW, cssH);
 
       var drawing = false, last = null;
@@ -831,7 +831,7 @@
     mainEl.appendChild(listCard);
 
     var card = el("div", "card");
-    card.appendChild(el("label","field-label","정자로 쓴 성명 " + '<span class="required-star">*</span>'));
+    card.appendChild(el("label","field-label","성명 " + '<span class="required-star">*</span>'));
     var nameInput = document.createElement("input");
     nameInput.type = "text"; nameInput.value = state.vocName; nameInput.placeholder = "예: 홍길동";
     nameInput.style.marginBottom = "16px";
@@ -964,7 +964,7 @@
 
     // inspector's confirmation signature over the "(확인)" mark next to 점검자
     if(inspectorSig.getCanvas()){
-      ctx.drawImage(inspectorSig.getCanvas(), 508, 92, 50, 20);
+      ctx.drawImage(inspectorSig.getCanvas(), 506, 90, 52, 24);
     }
 
     ctx.textAlign = "center";
@@ -1007,14 +1007,14 @@
     ctx.font = "12px 'Malgun Gothic','Apple SD Gothic Neo',sans-serif";
     fitTextCentered(ctx, shortAgency(state.storeAgency), 212, 734, 68);
 
-    // signature image onto the "___(서명)" line
+    // name written on the "___(서명)" line itself
+    ctx.fillStyle = "#000";
+    fitTextCentered(ctx, state.vocName, 323, 734, 66);
+
+    // signature image just above that line, over the "(서명)" mark
     if(vocSig.getCanvas()){
-      ctx.drawImage(vocSig.getCanvas(), 293, 704, 60, 30);
+      ctx.drawImage(vocSig.getCanvas(), 300, 710, 56, 24);
     }
-    // printed name under signature
-    ctx.font = "9px 'Malgun Gothic','Apple SD Gothic Neo',sans-serif";
-    ctx.fillStyle = "#333";
-    fitTextCentered(ctx, "(" + state.vocName + ")", 323, 748, 68);
 
     // small confirm checkbox top-right
     ctx.strokeStyle = "#000";
