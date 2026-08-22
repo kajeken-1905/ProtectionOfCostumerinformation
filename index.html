@@ -269,8 +269,11 @@
 
   var STORAGE_KEY_INSPECTOR = "skt_privacy_check_inspector_v1";
 
-  // agency(대리점명) / code(매장코드) / branch(매장명) — 사용자 제공 목록 기반 초기값
+  var TEAMS = ["서대구마케팅팀", "동대구마케팅팀", "경북마케팅팀", "RS파트"];
+
+  // team(마케팅팀) / agency(대리점명) / code(매장코드) / branch(매장명) — 사용자 제공 목록 기반 초기값
   // 주의: 이미지에서 옮겨 적은 값이라 오탈자가 있을 수 있어요. 매장 선택 후 코드가 맞는지 한 번 확인해주세요.
+  // 현재는 서대구마케팅팀 소속 대리점/매장만 등록되어 있습니다. 나머지 팀은 데이터 추가 예정.
   var DEFAULT_STORES = [
     ["대구대동대리점","D331250000","대구대동대리점 본점"],
     ["경북성주대리점","D331380000","경북성주대리점 본점"],
@@ -361,7 +364,7 @@
     ["백색대리점","D337270006","백색대리점 칠곡직영점"],
     ["백색대리점","D337270007","백색대리점 소매사무실"],
     ["백색대리점","D337270008","백색대리점 수성점"]
-  ].map(function(r){ return { agency: r[0], code: r[1], branch: r[2] }; });
+  ].map(function(r){ return { team: "서대구마케팅팀", agency: r[0], code: r[1], branch: r[2] }; });
 
   var CHECK_GROUPS = [
     { title: "실태점검", items: [
@@ -434,6 +437,7 @@
 
   var state = {
     step: 0,
+    team: "",
     storeAgency: "",
     storeBranch: "",
     storeCode: "",
@@ -565,7 +569,7 @@
 
   function canProceed(step){
     if(step === 0){
-      return state.storeBranch.trim().length > 0 && state.inspector.trim().length > 0;
+      return state.team.trim().length > 0 && state.storeBranch.trim().length > 0 && state.inspector.trim().length > 0;
     }
     if(step === 1){
       return inspectorSig.hasStroke();
@@ -586,26 +590,43 @@
   // ---------- Step 0: store info ----------
   function agencyList(){
     var seen = {}, out = [];
-    state.stores.forEach(function(s){ if(!seen[s.agency]){ seen[s.agency]=true; out.push(s.agency); } });
+    state.stores.forEach(function(s){
+      if(s.team === state.team && !seen[s.agency]){ seen[s.agency]=true; out.push(s.agency); }
+    });
     return out;
   }
   function branchesOf(agency){
-    return state.stores.filter(function(s){ return s.agency === agency; });
+    return state.stores.filter(function(s){ return s.team === state.team && s.agency === agency; });
   }
 
   function renderStore(){
     mainEl.innerHTML = "";
     mainEl.appendChild(el("p", "step-label", "STEP 1 / 5"));
     mainEl.appendChild(el("h2", "step-title", "매장 정보"));
-    mainEl.appendChild(el("p", "step-desc", "대리점명과 매장명을 선택하면 매장코드가 자동으로 채워집니다."));
+    mainEl.appendChild(el("p", "step-desc", "마케팅팀 → 대리점명 → 매장명 순으로 선택하면 매장코드가 자동으로 채워집니다."));
 
     var card = el("div", "card");
+
+    card.appendChild(labelEl("마케팅팀"));
+    var teamSel = document.createElement("select");
+    teamSel.style.marginBottom = "14px";
+    teamSel.innerHTML = '<option value="">-- 마케팅팀 선택 --</option>' +
+      TEAMS.map(function(t){ return '<option value="'+escapeHtml(t)+'"'+(t===state.team?' selected':'')+'>'+escapeHtml(t)+'</option>'; }).join("");
+    teamSel.onchange = function(){
+      state.team = teamSel.value;
+      state.storeAgency = "";
+      state.storeBranch = "";
+      state.storeCode = "";
+      render();
+    };
+    card.appendChild(teamSel);
 
     card.appendChild(labelEl("대리점명"));
     var agencySel = document.createElement("select");
     agencySel.style.marginBottom = "14px";
-    var agencies = agencyList();
-    agencySel.innerHTML = '<option value="">-- 대리점 선택 --</option>' +
+    var agencies = state.team ? agencyList() : [];
+    agencySel.disabled = !state.team;
+    agencySel.innerHTML = '<option value="">' + (state.team ? '-- 대리점 선택 --' : '먼저 마케팅팀을 선택하세요') + '</option>' +
       agencies.map(function(a){ return '<option value="'+escapeHtml(a)+'"'+(a===state.storeAgency?' selected':'')+'>'+escapeHtml(a)+'</option>'; }).join("");
     agencySel.onchange = function(){
       state.storeAgency = agencySel.value;
@@ -614,6 +635,10 @@
       render();
     };
     card.appendChild(agencySel);
+
+    if(state.team && agencies.length === 0){
+      card.appendChild(el("div", "hint", escapeHtml(state.team) + "에는 아직 등록된 대리점이 없습니다. 매장 목록이 추가되면 선택할 수 있어요."));
+    }
 
     card.appendChild(labelEl("매장명"));
     var branchSel = document.createElement("select");
