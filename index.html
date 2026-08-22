@@ -419,12 +419,11 @@
     inspector: localStorage.getItem(STORAGE_KEY_INSPECTOR) || "",
     checks: ALL_ITEMS.map(function(){ return false; }),
     vocName: "",
-    vocDate: todayStr(),
     stores: DEFAULT_STORES
   };
 
   function createSignaturePad(){
-    var canvas = null, ctx = null, hasStroke = false, points = [];
+    var canvas = null, ctx = null, hasStroke = false, points = [], windowPointerUpHandler = null;
     function pos(e){
       var r = canvas.getBoundingClientRect();
       var cx = (e.touches ? e.touches[0].clientX : e.clientX) - r.left;
@@ -470,7 +469,9 @@
       function end(){ if(drawing){ drawing = false; last = null; renderNav(); } }
       canvas.addEventListener("pointerdown", start);
       canvas.addEventListener("pointermove", move);
-      window.addEventListener("pointerup", end);
+      if(windowPointerUpHandler) window.removeEventListener("pointerup", windowPointerUpHandler);
+      windowPointerUpHandler = end;
+      window.addEventListener("pointerup", windowPointerUpHandler);
       canvas.addEventListener("touchstart", start, {passive:false});
       canvas.addEventListener("touchmove", move, {passive:false});
       canvas.addEventListener("touchend", end);
@@ -933,10 +934,10 @@
     ctx.fillStyle = "#000";
     ctx.font = "bold 46px 'IBM Plex Mono',monospace";
     ctx.textAlign = "center";
-    ctx.fillText(state.vocDate, 2156, 245);
+    ctx.fillText(state.inspectDate, 2156, 245);
 
     // "202_년 __월 __일": fill each blank digit in its own gap
-    var d = new Date(state.vocDate + "T00:00:00");
+    var d = new Date(state.inspectDate + "T00:00:00");
     ctx.font = "30px 'Malgun Gothic','Apple SD Gothic Neo',sans-serif";
     ctx.textAlign = "center";
     ctx.fillText(String(d.getFullYear()).slice(-1), 1197, 3156);
@@ -1107,7 +1108,6 @@
     state.inspectDate = todayStr();
     state.checks = ALL_ITEMS.map(function(){ return false; });
     state.vocName = "";
-    state.vocDate = todayStr();
     vocSig.clear();
     inspectorSig.clear();
   }
